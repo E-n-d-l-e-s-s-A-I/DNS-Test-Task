@@ -16,4 +16,7 @@ class Store(UniqueNamed):
     )
 
     city: Mapped["City"] = relationship(back_populates="stores")
-    sales: Mapped[list["Sale"]] = relationship(back_populates="store")
+    sales: Mapped[list["Sale"]] = relationship(
+        back_populates="store",
+        cascade="all, delete"
+    )
