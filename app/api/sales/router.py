@@ -3,7 +3,6 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends
 
-
 from .schemas import (
     SaleProductSchema,
     SaleSchema,
@@ -12,7 +11,7 @@ from .schemas import (
     SaleSchemaUpdatePartial,
     SaleProductSchemaCreate,
     SaleProductSchemaUpdatePartial,
-    ProductSchemaWithUnitPrice
+
 )
 from .repository import SaleRepository
 from app.db.database import database
@@ -28,6 +27,7 @@ from app.utils.shemas import CreateResultSchema
 router = APIRouter(
     prefix="/sales",
     tags=["Продажи"],
+    dependencies=[Depends(database.session_dependency)],
 )
 
 
@@ -36,7 +36,7 @@ router = APIRouter(
     responses=get_http_exceptions_description(InvalidParameterException)
 )
 async def get_sales(
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
     city_id: Optional[int] = None,
     store_id: Optional[int] = None,
     product_id: Optional[int] = None,
@@ -64,7 +64,7 @@ async def get_sales(
     responses=get_http_exceptions_description(NotFoundException),
 )
 async def get_sale(
-    sale_id: int, session: AsyncSession = Depends(database.session_dependancy)
+    sale_id: int, session: AsyncSession = Depends(database.session_dependency)
 ) -> SaleSchema:
     return await SaleRepository.get_object(session=session, object_id=sale_id)
 
@@ -75,7 +75,7 @@ async def get_sale(
 )
 async def create_sale(
     sale_data: SaleSchemaCreate,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> CreateResultSchema:
     sale_id = await SaleRepository.create_object(
         session=session,
@@ -94,7 +94,7 @@ async def create_sale(
 async def update_partial_sale(
     sale_id: int,
     sale_data: SaleSchemaUpdatePartial,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> SaleSchema:
     return await SaleRepository.update_partial_object(
         session=session, object_id=sale_id, data=sale_data
@@ -109,7 +109,7 @@ async def update_partial_sale(
 )
 async def delete_sale(
     sale_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> SaleSchema:
     return await SaleRepository.delete_object(
         session=session,
@@ -123,7 +123,7 @@ async def delete_sale(
 )
 async def get_products(
     sale_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> SaleSchemaDetail:
     return await SaleRepository.get_products(
         session=session,
@@ -141,7 +141,7 @@ async def get_products(
 async def add_product(
     sale_id: int,
     product_data: SaleProductSchemaCreate,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> SaleSchemaDetail:
     return await SaleRepository.add_product(
         session=session,
@@ -160,7 +160,7 @@ async def update_product_in_sale(
     sale_id: int,
     product_id: int,
     product_data: SaleProductSchemaUpdatePartial,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> SaleProductSchema:
     return await SaleRepository.update_partial_product(
         session=session,
@@ -177,7 +177,7 @@ async def update_product_in_sale(
 async def delete_product_in_sale(
     sale_id: int,
     product_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> SaleProductSchema:
     return await SaleRepository.delete_product(
         session=session,

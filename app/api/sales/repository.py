@@ -99,15 +99,14 @@ class SaleRepository(BaseRepository):
     ) -> int:
         # we need select products to get actual price
         products = await ProductRepository.get_products_by_ids(
-            session=session,
-            ids=data.produsts_ids
+            session=session, ids=data.products_ids
         )
         products_quantity = {product_info.product_id: product_info.quantity
                              for product_info in data.products
                              }
 
         # if any of input products not found
-        if len(products) != len(data.produsts_ids):
+        if len(products) != len(data.products_ids):
             raise DBIntegrityException
 
         sale = Sale(store_id=data.store_id)

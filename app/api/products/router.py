@@ -19,12 +19,13 @@ from app.utils.shemas import CreateResultSchema
 router = APIRouter(
     prefix="/products",
     tags=["Товары"],
+    dependencies=[Depends(database.session_dependency)],
 )
 
 
 @router.get("")
 async def get_products(
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> list[ProductSchema]:
     return await ProductRepository.get_objects(session=session)
 
@@ -35,7 +36,7 @@ async def get_products(
 )
 async def get_product(
     product_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> ProductSchema:
     return await ProductRepository.get_object(
         session=session, object_id=product_id
@@ -48,7 +49,7 @@ async def get_product(
 )
 async def create_product(
     product_data: ProductSchemaCreate,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> CreateResultSchema:
     product_id = await ProductRepository.create_object(
         session=session,
@@ -67,7 +68,7 @@ async def create_product(
 async def update_partial_product(
     product_id: int,
     product_data: ProductSchemaUpdatePartial,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> ProductSchema:
     return await ProductRepository.update_partial_object(
         session=session, object_id=product_id, data=product_data
@@ -80,7 +81,7 @@ async def update_partial_product(
 )
 async def delete_product(
     product_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> ProductSchema:
     return await ProductRepository.delete_object(
         session=session, object_id=product_id

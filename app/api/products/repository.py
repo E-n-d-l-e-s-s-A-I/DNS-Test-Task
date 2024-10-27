@@ -13,6 +13,9 @@ class ProductRepository(BaseRepository):
     async def get_products_by_ids(
         cls, *, session: AsyncSession, ids: list[int]
     ) -> list[Product]:
+        if not ids:
+            return []
+
         query = select(Product).filter(Product.id.in_(ids))
         result: Result = await session.execute(query)
         return result.scalars().all()

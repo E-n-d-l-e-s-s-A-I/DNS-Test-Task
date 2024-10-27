@@ -15,12 +15,13 @@ from app.utils.shemas import CreateResultSchema
 router = APIRouter(
     prefix="/cities",
     tags=["Города"],
+    dependencies=[Depends(database.session_dependency)],
 )
 
 
 @router.get("")
 async def get_cities(
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> list[CitySchema]:
     return await CityRepository.get_objects(session=session)
 
@@ -30,7 +31,7 @@ async def get_cities(
     responses=get_http_exceptions_description(NotFoundException),
 )
 async def get_city(
-    city_id: int, session: AsyncSession = Depends(database.session_dependancy)
+    city_id: int, session: AsyncSession = Depends(database.session_dependency)
 ) -> CitySchema:
     return await CityRepository.get_object(session=session, object_id=city_id)
 
@@ -41,7 +42,7 @@ async def get_city(
 )
 async def create_city(
     city_data: CitySchemaCreate,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> CreateResultSchema:
     city_id = await CityRepository.create_object(
         session=session, data=city_data
@@ -59,7 +60,7 @@ async def create_city(
 async def update_partial_city(
     city_id: int,
     city_data: CitySchemaUpdatePartial,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> CitySchema:
     return await CityRepository.update_partial_object(
         session=session, object_id=city_id, data=city_data
@@ -72,7 +73,7 @@ async def update_partial_city(
 )
 async def delete_city(
     city_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> CitySchema:
     return await CityRepository.delete_object(
         session=session, object_id=city_id

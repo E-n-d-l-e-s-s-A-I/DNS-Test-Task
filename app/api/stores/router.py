@@ -14,12 +14,13 @@ from app.utils.shemas import CreateResultSchema
 router = APIRouter(
     prefix="/stores",
     tags=["Магазины"],
+    dependencies=[Depends(database.session_dependency)],
 )
 
 
 @router.get("")
 async def get_stores(
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> list[StoreSchema]:
     return await StoreRepository.get_objects(session=session)
 
@@ -29,7 +30,7 @@ async def get_stores(
     responses=get_http_exceptions_description(NotFoundException),
 )
 async def get_store(
-    store_id: int, session: AsyncSession = Depends(database.session_dependancy)
+    store_id: int, session: AsyncSession = Depends(database.session_dependency)
 ) -> StoreSchema:
     return await StoreRepository.get_object(
         session=session, object_id=store_id
@@ -42,7 +43,7 @@ async def get_store(
 )
 async def create_store(
     store_data: StoreSchemaCreate,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> CreateResultSchema:
     store_id = await StoreRepository.create_object(
         session=session, data=store_data
@@ -60,7 +61,7 @@ async def create_store(
 async def update_partial_store(
     store_id: int,
     store_data: StoreSchemaUpdatePartial,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> StoreSchema:
     return await StoreRepository.update_partial_object(
         session=session, object_id=store_id, data=store_data
@@ -73,7 +74,7 @@ async def update_partial_store(
 )
 async def delete_store(
     store_id: int,
-    session: AsyncSession = Depends(database.session_dependancy),
+    session: AsyncSession = Depends(database.session_dependency),
 ) -> StoreSchema:
     return await StoreRepository.delete_object(
         session=session, object_id=store_id

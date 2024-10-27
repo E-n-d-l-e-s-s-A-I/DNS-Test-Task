@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from pydantic import BaseModel, field_validator
 
 # from app.api.products.schemas import ProductSchema
@@ -66,7 +67,7 @@ class SaleSchemaCreate(SaleSchemaBase):
     products: list[SaleProductSchemaCreate]
 
     @property
-    def produsts_ids(self) -> list[int]:
+    def products_ids(self) -> list[int]:
         return [product.product_id for product in self.products]
 
     @field_validator("products")

@@ -1,5 +1,6 @@
-from pydantic import BaseModel, field_validator
 from decimal import Decimal
+
+from pydantic import BaseModel, field_validator
 
 from app.utils.validators import price_validator, name_validator
 

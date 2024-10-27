@@ -1,12 +1,11 @@
-from abc import abstractmethod
 from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel
 
+from pydantic import BaseModel
 
 from app.db.abstract_models import Base
 from app.utils.exceptions import DBIntegrityException, NotFoundException
@@ -17,13 +16,11 @@ class BaseRepository:
 
     @classmethod
     async def get_objects(
-        cls, *, session: AsyncSession, options: Any = None, filters
-    ) -> list[Any]:
+        cls, *, session: AsyncSession, options: Any = None
+    ) -> list[Base]:
 
         query = select(cls.model).order_by(cls.model.id)
         query = cls.apply_options_to_query(query, options)
-        for filter in filters:
-            query = query.filter(filter)
 
         result: Result = await session.execute(query)
         model_objects = result.scalars().all()
@@ -36,7 +33,7 @@ class BaseRepository:
         session: AsyncSession,
         object_id: int,
         options: Any = None,
-    ):
+    ) -> Base:
 
         query = select(cls.model).filter_by(id=object_id)
         query = cls.apply_options_to_query(query, options)
@@ -64,7 +61,7 @@ class BaseRepository:
     @classmethod
     async def update_partial_object(
         cls, *, session: AsyncSession, object_id: int, data: BaseModel
-    ):
+    ) -> Base:
         model_object = await cls.get_object(
             session=session, object_id=object_id
         )
@@ -79,7 +76,7 @@ class BaseRepository:
     @classmethod
     async def delete_object(
         cls, *, session: AsyncSession, object_id: int
-    ):
+    ) -> Base:
         model_object = await cls.get_object(
             session=session, object_id=object_id
         )
@@ -90,7 +87,7 @@ class BaseRepository:
     @classmethod
     async def refresh_object(
         cls, *, session: AsyncSession, model_object: Any
-    ):
+    ) -> Base:
         try:
             await session.commit()
             await session.refresh(model_object)
@@ -100,7 +97,7 @@ class BaseRepository:
             await session.rollback()
             raise DBIntegrityException
 
-    @abstractmethod
+    @staticmethod
     def apply_options_to_query(query, options):
         if options:
             query = query.options(options)
