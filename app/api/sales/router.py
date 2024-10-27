@@ -1,3 +1,5 @@
+from decimal import Decimal
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends
 
@@ -6,6 +8,7 @@ from .schemas import (
     SaleProductSchema,
     SaleSchema,
     SaleSchemaCreate,
+    SaleSchemaDetail,
     SaleSchemaUpdatePartial,
     SaleProductSchemaCreate,
     SaleProductSchemaUpdatePartial,
@@ -16,6 +19,7 @@ from app.db.database import database
 from app.utils.exceptions import (
     DBIntegrityException,
     NotFoundException,
+    InvalidParameterException,
     get_http_exceptions_description,
 )
 from app.utils.shemas import CreateResultSchema
@@ -27,11 +31,32 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get(
+    "",
+    responses=get_http_exceptions_description(InvalidParameterException)
+)
 async def get_sales(
     session: AsyncSession = Depends(database.session_dependancy),
+    city_id: Optional[int] = None,
+    store_id: Optional[int] = None,
+    product_id: Optional[int] = None,
+    days: Optional[int] = None,
+    min_amount: Optional[Decimal] = None,
+    max_amount: Optional[Decimal] = None,
+    min_quantity: Optional[int] = None,
+    max_quantity: Optional[int] = None,
 ) -> list[SaleSchema]:
-    return await SaleRepository.get_objects(session=session)
+    return await SaleRepository.get_objects(
+        session=session,
+        city_id=city_id,
+        store_id=store_id,
+        product_id=product_id,
+        days=days,
+        min_amount=min_amount,
+        max_amount=max_amount,
+        min_quantity=min_quantity,
+        max_quantity=max_quantity,
+    )
 
 
 @router.get(
@@ -79,8 +104,7 @@ async def update_partial_sale(
 @router.delete(
     "/{sale_id}",
     responses=get_http_exceptions_description(
-        NotFoundException,
-        DBIntegrityException
+        NotFoundException
     ),
 )
 async def delete_sale(
@@ -100,7 +124,7 @@ async def delete_sale(
 async def get_products(
     sale_id: int,
     session: AsyncSession = Depends(database.session_dependancy),
-) -> list[ProductSchemaWithUnitPrice]:
+) -> SaleSchemaDetail:
     return await SaleRepository.get_products(
         session=session,
         sale_id=sale_id,
@@ -118,7 +142,7 @@ async def add_product(
     sale_id: int,
     product_data: SaleProductSchemaCreate,
     session: AsyncSession = Depends(database.session_dependancy),
-) -> SaleSchema:
+) -> SaleSchemaDetail:
     return await SaleRepository.add_product(
         session=session,
         sale_id=sale_id,

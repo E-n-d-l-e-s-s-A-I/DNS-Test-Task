@@ -51,6 +51,15 @@ class SaleSchemaBase(BaseModel):
 class SaleSchema(SaleSchemaBase):
     id: int
     products: list[SaleProductSchema]
+    total_amount: Decimal
+    total_quantity: int
+
+
+class SaleSchemaDetail(SaleSchemaBase):
+    id: int
+    products_details: list[ProductSchemaWithUnitPrice]
+    total_amount: Decimal
+    total_quantity: int
 
 
 class SaleSchemaCreate(SaleSchemaBase):

@@ -17,11 +17,13 @@ class BaseRepository:
 
     @classmethod
     async def get_objects(
-        cls, *, session: AsyncSession, options: Any = None, **filters
+        cls, *, session: AsyncSession, options: Any = None, filters
     ) -> list[Any]:
 
-        query = select(cls.model).filter_by(**filters).order_by(cls.model.id)
+        query = select(cls.model).order_by(cls.model.id)
         query = cls.apply_options_to_query(query, options)
+        for filter in filters:
+            query = query.filter(filter)
 
         result: Result = await session.execute(query)
         model_objects = result.scalars().all()

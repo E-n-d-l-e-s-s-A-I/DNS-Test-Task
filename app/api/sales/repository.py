@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -11,21 +13,74 @@ from .schemas import (
     SaleProductSchemaUpdatePartial,
 )
 from app.api.products.repository import ProductRepository
+from app.api.stores.models import Store
 from app.utils.repository import BaseRepository
-from app.utils.exceptions import NotFoundException, DBIntegrityException
+from app.utils.exceptions import (
+    NotFoundException,
+    DBIntegrityException,
+    InvalidParameterException
+)
 
 
 class SaleRepository(BaseRepository):
     model = Sale
 
+    filters_conditions = {
+        "city_id": lambda city_id: Store.city_id == city_id,
+        "store_id": lambda store_id: Sale.store_id == store_id,
+        "product_id": lambda product_id: SaleProducts.product_id == product_id,
+        "days": lambda days: (
+            Sale.created_at >= (
+                datetime.utcnow() - timedelta(days=days)
+            )
+        ),
+        "min_amount": lambda min_amount: Sale.total_amount >= min_amount,
+        "max_amount": lambda max_amount: Sale.total_amount <= max_amount,
+        "min_quantity": lambda min_quantity: (
+            Sale.total_quantity >= min_quantity
+        ),
+        "max_quantity": lambda max_quantity: (
+            Sale.total_quantity <= max_quantity
+        ),
+    }
+
+    filters_joins = {
+        ("product_id",): Sale.products,
+        ("city_id",): Sale.store,
+    }
+
     @classmethod
     async def get_objects(
-        cls, *, session: AsyncSession
+        cls,
+        *,
+        session: AsyncSession,
+        **filters
     ) -> list[Sale]:
-        sales = await super().get_objects(
-            session=session,
-            options=(selectinload(Sale.products))
-        )
+        # breakpoint()
+
+        # remove none filters kwargs
+        filters = {k: v for k, v in filters.items() if v is not None}
+
+        query = select(Sale).order_by(Sale.id)
+
+        # join others tables, if necessary
+        for filter_keys, join_relation in cls.filters_joins.items():
+            if set(filter_keys) & filters.keys():
+                query = query.join(join_relation)
+
+        # apply filters
+        for filter_key, filter_value in filters.items():
+            try:
+                query = query.filter(
+                    cls.filters_conditions[filter_key](filter_value)
+                )
+            except KeyError:
+                raise InvalidParameterException
+
+        # make query
+        query = query.options(selectinload(Sale.products))
+        result: Result = await session.execute(query)
+        sales = list(result.scalars().unique().all())
         return sales
 
     @classmethod
@@ -51,6 +106,7 @@ class SaleRepository(BaseRepository):
                              for product_info in data.products
                              }
 
+        # if any of input products not found
         if len(products) != len(data.produsts_ids):
             raise DBIntegrityException
 
@@ -64,7 +120,7 @@ class SaleRepository(BaseRepository):
             )
 
         session.add(sale)
-        sale = await cls.refresh_object(
+        sale: Sale = await cls.refresh_object(
             session=session,
             model_object=sale,
         )
@@ -74,7 +130,7 @@ class SaleRepository(BaseRepository):
     async def get_products(
         cls, *, session: AsyncSession, sale_id: int
     ) -> list[Product]:
-        sale = await super().get_object(
+        sale: Sale = await super().get_object(
             session=session,
             object_id=sale_id,
             options=(
@@ -82,15 +138,8 @@ class SaleRepository(BaseRepository):
             )
         )
 
-        result = []
-
-        # and add quantity and unit_price to product
-        for product_detail in sale.products:
-            product_detail.product.unit_price = product_detail.unit_price
-            product_detail.product.quantity = product_detail.quantity
-            result.append(product_detail.product)
-
-        return result
+        sale.products_details = cls.get_products_details(sale)
+        return sale
 
     @classmethod
     async def add_product(
@@ -99,17 +148,18 @@ class SaleRepository(BaseRepository):
         session: AsyncSession,
         sale_id: int,
         product_data: SaleProductSchemaCreate,
-    ) -> Sale:
-        sale = await super().get_object(
+    ) -> list[Product]:
+        sale: Sale = await super().get_object(
             session=session,
             object_id=sale_id,
             options=(
                 selectinload(Sale.products)
+                .joinedload(SaleProducts.product)
             )
         )
 
         # we need select product to get actual price
-        product = await ProductRepository.get_object(
+        product: Product = await ProductRepository.get_object(
             session=session,
             object_id=product_data.product_id,
         )
@@ -122,10 +172,13 @@ class SaleRepository(BaseRepository):
             )
         )
 
-        return await cls.refresh_object(
+        sale: Sale = await cls.refresh_object(
             session=session,
             model_object=sale,
         )
+
+        sale.products_details = cls.get_products_details(sale)
+        return sale
 
     @classmethod
     async def update_partial_product(
@@ -186,3 +239,17 @@ class SaleRepository(BaseRepository):
         if sale_product is None:
             raise NotFoundException
         return sale_product
+
+    @classmethod
+    def get_products_details(
+        cls, sale: Sale
+    ) -> list[Product]:
+        result = []
+
+        # and add quantity and unit_price to product
+        for product_detail in sale.products:
+            product_detail.product.unit_price = product_detail.unit_price
+            product_detail.product.quantity = product_detail.quantity
+            result.append(product_detail.product)
+
+        return result

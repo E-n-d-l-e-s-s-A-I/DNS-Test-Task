@@ -9,6 +9,11 @@ DBIntegrityException = HTTPException(
     detail="unique field duplicated or invalid foreign key",
 )
 
+InvalidParameterException = HTTPException(
+    status_code=400,
+    detail="invalid request parameter",
+)
+
 
 def get_http_exceptions_description(
     *http_exceptions: HTTPException,
