@@ -1,5 +1,4 @@
 from decimal import Decimal
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends
 
@@ -37,14 +36,14 @@ router = APIRouter(
 )
 async def get_sales(
     session: AsyncSession = Depends(database.session_dependency),
-    city_id: Optional[int] = None,
-    store_id: Optional[int] = None,
-    product_id: Optional[int] = None,
-    days: Optional[int] = None,
-    min_amount: Optional[Decimal] = None,
-    max_amount: Optional[Decimal] = None,
-    min_quantity: Optional[int] = None,
-    max_quantity: Optional[int] = None,
+    city_id: int | None = None,
+    store_id: int | None = None,
+    product_id: int | None = None,
+    days: int | None = None,
+    min_amount: Decimal | None = None,
+    max_amount: Decimal | None = None,
+    min_quantity: int | None = None,
+    max_quantity: int | None = None,
 ) -> list[SaleSchema]:
     return await SaleRepository.get_objects(
         session=session,
