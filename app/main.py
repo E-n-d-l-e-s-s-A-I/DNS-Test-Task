@@ -6,7 +6,7 @@ from app.api import routers
 app = FastAPI(
     title="Sales API",
     description=(
-        "Sales API — это FastAPI приложение для управления продажами"
+        "Sales API — это FastAPI приложение для управления продажами "
         "в сети магазинов бытовой техники"
     ),
 )
