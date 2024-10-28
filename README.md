@@ -94,7 +94,7 @@
         "id": 1,
         "name": "Название города",
       },
-      ...
+      "{... more cities ...}"
 	]
 	```
 
@@ -171,7 +171,7 @@
         "name": "Название магазина",
         "city_id": 1
       },
-      ...
+      "{... more stores ...}"
     ]
 	```
 
@@ -254,7 +254,7 @@
         "name": "Название товара",
         "price": "11.11"
       },
-      ...
+      "{... more products ...}"
      ]
 	```
 
@@ -366,12 +366,12 @@
             "quantity": 1,
             "unit_price": "11.11"
           },
-          ...
+          "{... more products ...}"
         ],
         "total_amount": "11.11",
         "total_quantity": 1
       },
-      ...
+      "{... more sales ...}"
     ]
 	```
   - Ошибки:
@@ -389,7 +389,7 @@
         "product_id": 1
         "quantity": 1,
       },
-      ...
+      "{... more products ...}"
     ]
   }
   ```
@@ -417,7 +417,7 @@
         "quantity": 1,
         "unit_price": "12.11"
       },
-      ...
+      "{... more products ...}"
     ],
     "total_amount": "11.11",
     "total_quantity": 1
@@ -445,7 +445,7 @@
         "product_id": 1,
         "unit_price": "11.11"
       },
-      ...
+      "{... more products ...}"
     ],
     "total_amount": "11.11",
     "total_quantity": 1
@@ -469,7 +469,7 @@
         "product_id": 1,
         "unit_price": "12.11"
       },
-      ...
+      "{... more products ...}"
     ],
     "total_amount": "11.11",
     "total_quantity": 1
@@ -492,7 +492,7 @@
         "quantity": 1,
         "unit_price": "11.11"
       },
-      ...
+      "{... more products ...}"
     ],
     "total_amount": "11.11",
     "total_quantity": 1
@@ -523,7 +523,7 @@
         "quantity": 1,
         "unit_price": "11.11"
       },
-      ...
+      "{... more products ...}"
     ],
     "total_amount": "11.11",
     "total_quantity": 1
@@ -546,7 +546,7 @@
   ```json
   {
     "product_id": 1,
-    "quantity": 2
+    "quantity": 2,
     "unit_price": "11.11"
   }
   ```
