@@ -1,4 +1,5 @@
 from asyncio import current_task
+from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -9,9 +10,18 @@ from sqlalchemy.ext.asyncio import (
 from app.config import settings
 
 
-class database:
-    def __init__(self, url: str, echo: bool = False) -> None:
-        self.engine = create_async_engine(url, echo=echo)
+if settings.MODE == "TEST":
+    DATABASE_URL = settings.TEST_DATABASE_URL
+    DATABASE_KWARGS = {"poolclass": NullPool}
+else:
+    DATABASE_URL = settings.DATABASE_URL
+    DATABASE_KWARGS = {}
+
+
+class Database:
+
+    def __init__(self, url: str, echo: bool = False, **kwaqrgs) -> None:
+        self.engine = create_async_engine(url, echo=echo, **kwaqrgs)
 
         self.async_session_maker = async_sessionmaker(
             self.engine,
@@ -33,4 +43,4 @@ class database:
         await session.close()
 
 
-database = database(settings.DATABASE_URL, settings.ECHO)
+database = Database(DATABASE_URL, settings.ECHO, **DATABASE_KWARGS)
