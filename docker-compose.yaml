@@ -4,7 +4,7 @@ services:
     image: postgres:16
     container_name: db_app
     env_file:
-      - .env
+      - .env-prod
     ports:
       - 5432:5432
 
@@ -14,7 +14,7 @@ services:
       context: .
     container_name: sales_app
     env_file:
-      - .env
+      - .env-prod
     depends_on:
       - db
     command: ["/dns_test_task/docker/app.sh"]
