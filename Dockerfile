@@ -10,6 +10,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod a+x /dns_test_task/docker/*.sh
+RUN chmod a+x /dns_test_task/docker_scripts/*.sh
 
 CMD ["uvicorn", "app.main:app", "--reload", "--bind=0.0.0.0:5000"]
