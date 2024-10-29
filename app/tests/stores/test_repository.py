@@ -85,6 +85,19 @@ async def test_dont_update_partial_object_to_already_exists_name(
         assert isinstance(e, DBIntegrityException)
 
 
+async def test_dont_update_partial_object_to_not_exists_city_id(
+    session, store_add_data_with_not_existsting_city
+):
+
+    with pytest.raises(HTTPException) as e:
+        await StoreRepository.update_partial_object(
+            session=session,
+            object_id=2,
+            data=store_add_data_with_not_existsting_city,
+        )
+        assert isinstance(e, DBIntegrityException)
+
+
 async def test_delete_object(session, stores):
     store_id = 1
 

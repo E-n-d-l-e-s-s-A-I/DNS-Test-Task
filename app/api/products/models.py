@@ -17,4 +17,5 @@ class Product(UniqueNamed):
 
     sales_details: Mapped[list["SaleProducts"]] = relationship(
         back_populates="product",
+        cascade="all, delete"
     )
