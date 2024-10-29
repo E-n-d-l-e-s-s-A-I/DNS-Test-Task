@@ -12,7 +12,7 @@ from app.config import settings
 
 if settings.MODE == "TEST":
     DATABASE_URL = settings.TEST_DATABASE_URL
-    DATABASE_KWARGS = {"poolclass": NullPool}
+    DATABASE_KWARGS = {"savemode": True, "poolclass": NullPool}
 else:
     DATABASE_URL = settings.DATABASE_URL
     DATABASE_KWARGS = {}
@@ -20,9 +20,16 @@ else:
 
 class Database:
 
-    def __init__(self, url: str, echo: bool = False, **kwaqrgs) -> None:
+    def __init__(
+        self, url:
+            str,
+            echo:
+            bool = False,
+            savemode: bool = False,
+            **kwaqrgs
+    ) -> None:
         self.engine = create_async_engine(url, echo=echo, **kwaqrgs)
-
+        self.savemode = savemode
         self.async_session_maker = async_sessionmaker(
             self.engine,
             class_=AsyncSession,
@@ -38,9 +45,15 @@ class Database:
         return session
 
     async def session_dependency(self) -> AsyncSession:
-        session = self.get_scoped_session()
-        yield session
-        await session.close()
+        async with database.engine.connect() as connection:
+            async with connection.begin() as transaction:
+                scoped_session = self.get_scoped_session()
+                async with (
+                    scoped_session(bind=connection) as session
+                ):
+                    yield session
+                    if transaction.is_active and self.savemode:
+                        await transaction.rollback()
 
 
 database = Database(DATABASE_URL, settings.ECHO, **DATABASE_KWARGS)

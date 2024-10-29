@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     TEST_DB_HOST: str
     TEST_DB_PORT: int
 
-    model_config = ConfigDict(env_file=".env")
+    model_config = ConfigDict(env_file="envs/.env")
 
     @property
     def DATABASE_URL(self):

@@ -2,7 +2,11 @@
 
 from sqlalchemy import String
 from sqlalchemy.orm import (
-    Mapped, mapped_column, DeclarativeBase, declared_attr
+    Mapped,
+    mapped_column,
+    DeclarativeBase,
+    declared_attr,
+    class_mapper,
 )
 
 from app.config import settings
@@ -22,6 +26,13 @@ class Base(DeclarativeBase):
         ]
 
         return f"<{self.__class__.__name__} {', '.join(repr_cols_with_vals)}>"
+
+    def to_dict(self):
+        return {
+            column.key: getattr(self, column.key)
+            for column in class_mapper(self.__class__).columns
+            if column.name != "id"
+        }
 
 
 class UniqueNamed(Base):

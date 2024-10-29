@@ -15,17 +15,18 @@ from app.api.sales.models import Sale, SaleProducts
 models = (City, Store, Product, Sale, SaleProducts)
 
 
+def open_json(model_name: str):
+    with open(
+        f"app/db/test_data/{model_name}.json",
+        encoding="utf-8"
+    ) as file:
+        return json.load(file)
+
+
 async def select_test_data():
     async with database.engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
-
-    def open_json(model_name: str):
-        with open(
-            f"app/db/test_data/{model_name}.json",
-            encoding="utf-8"
-        ) as file:
-            return json.load(file)
 
     async with database.async_session_maker() as session:
         for model in models:
@@ -37,3 +38,4 @@ async def select_test_data():
 
 if __name__ == "__main__":
     asyncio.run(select_test_data())
+    print("данные успешно вставлены")
