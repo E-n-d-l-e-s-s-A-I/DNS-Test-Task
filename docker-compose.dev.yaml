@@ -4,11 +4,11 @@ services:
     image: postgres:16
     container_name: db_app_dev
     env_file:
-      - /envs/.env-dev
+      - /envs/.env-develop
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: sales
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
     ports:
       - 5432:5432
 
@@ -16,11 +16,11 @@ services:
     image: postgres:16
     container_name: test_db_app_dev
     env_file:
-      - /envs/.env-dev
+      - /envs/.env-develop
     environment:
-      POSTGRES_DB: ${TEST_POSTGRES_DB}
-      POSTGRES_USER: ${TEST_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD}
+      POSTGRES_DB: sales_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
     ports:
       - 5433:5432
 
@@ -30,7 +30,7 @@ services:
       context: .
     container_name: sales_app_dev
     env_file:
-      - /envs/.env-dev
+      - /envs/.env-develop
     depends_on:
       - postgres
       - postgres_test

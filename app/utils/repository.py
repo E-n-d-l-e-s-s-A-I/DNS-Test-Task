@@ -94,8 +94,7 @@ class BaseRepository:
             await session.commit()
             await session.refresh(model_object)
             return model_object
-        except IntegrityError as e:
-            print(e._message)
+        except IntegrityError:
             await session.rollback()
             raise DBIntegrityException
 
