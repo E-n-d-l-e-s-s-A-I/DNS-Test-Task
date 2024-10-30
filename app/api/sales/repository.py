@@ -128,7 +128,7 @@ class SaleRepository(BaseRepository):
     @classmethod
     async def get_products(
         cls, *, session: AsyncSession, sale_id: int
-    ) -> list[Product]:
+    ) -> Sale:
         sale: Sale = await super().get_object(
             session=session,
             object_id=sale_id,
@@ -147,7 +147,7 @@ class SaleRepository(BaseRepository):
         session: AsyncSession,
         sale_id: int,
         product_data: SaleProductSchemaCreate,
-    ) -> list[Product]:
+    ) -> Sale:
         sale: Sale = await super().get_object(
             session=session,
             object_id=sale_id,

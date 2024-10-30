@@ -29,5 +29,11 @@
         "product_id": 3,
         "quantity": 2 ,
         "unit_price": 1000 
+    },
+    {
+        "sale_id": 6,
+        "product_id": 1,
+        "quantity": 2 ,
+        "unit_price": 200 
     }
 ]

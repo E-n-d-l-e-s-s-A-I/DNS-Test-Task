@@ -115,6 +115,6 @@ async def test_update_partial_store(
     ),
 )
 async def test_delete_store(ac: AsyncClient, id, status_code):
-    response = await ac.get(f"/stores/{id}")
+    response = await ac.delete(f"/stores/{id}")
     print(response._content)
     assert response.status_code == status_code

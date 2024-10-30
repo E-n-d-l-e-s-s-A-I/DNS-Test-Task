@@ -7,7 +7,8 @@ from app.utils.exceptions import DBIntegrityException
 
 
 async def test_get_objects(session, cities):
-    cities_models = await CityRepository.get_objects(session=session)
+    cities_models: list[City] = await CityRepository.get_objects(
+        session=session)
 
     cites_from_rep = [
         city_model.to_dict() for city_model in cities_models
@@ -16,7 +17,7 @@ async def test_get_objects(session, cities):
 
 
 async def test_get_object(session, cities):
-    city_model = await CityRepository.get_object(
+    city_model: City = await CityRepository.get_object(
         session=session, object_id=1
     )
     city_from_rep = city_model.to_dict()
@@ -30,6 +31,9 @@ async def test_create_object(session, city_add_data):
         )
 
     assert isinstance(city_id, int)
+
+    city: City = await session.get(City, city_id)
+    assert city.name == city_add_data.name
 
 
 async def test_dont_create_object_with_already_exists_name(
@@ -49,12 +53,14 @@ async def test_dont_create_object_with_already_exists_name(
 
 
 async def test_update_partial_object(session, city_update_data):
-    city_model: City = await CityRepository.update_partial_object(
+    city_id = 1
+    await CityRepository.update_partial_object(
         session=session,
-        object_id=1,
+        object_id=city_id,
         data=city_update_data,
         )
-    assert city_update_data.name == city_model.name
+    city: City = await session.get(City, city_id)
+    assert city.name == city_update_data.name
 
 
 async def test_dont_update_partial_object_to_already_exists_name(
@@ -78,7 +84,7 @@ async def test_dont_update_partial_object_to_already_exists_name(
 async def test_delete_object(session, cities):
     city_id = 1
 
-    city_model = await CityRepository.delete_object(
+    city_model: City = await CityRepository.delete_object(
         session=session,
         object_id=city_id,
         )

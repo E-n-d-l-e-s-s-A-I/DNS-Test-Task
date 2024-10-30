@@ -7,7 +7,8 @@ from app.utils.exceptions import DBIntegrityException
 
 
 async def test_get_objects(session, products):
-    products_models = await ProductRepository.get_objects(session=session)
+    products_models: list[Product] = await ProductRepository.get_objects(
+        session=session)
 
     products_from_rep = [
         product_model.to_dict() for product_model in products_models
@@ -16,7 +17,7 @@ async def test_get_objects(session, products):
 
 
 async def test_get_object(session, products):
-    product_model = await ProductRepository.get_object(
+    product_model: Product = await ProductRepository.get_object(
         session=session, object_id=1
     )
     product_from_rep = product_model.to_dict()
@@ -30,6 +31,11 @@ async def test_create_object(session, product_add_data):
     )
 
     assert isinstance(product_id, int)
+
+    product: Product = await session.get(Product, product_id)
+
+    assert product.name == product_add_data.name
+    assert product.price == product_add_data.price
 
 
 async def test_dont_create_object_with_already_exists_name(
@@ -49,13 +55,17 @@ async def test_dont_create_object_with_already_exists_name(
 
 
 async def test_update_partial_object(session, product_update_data):
-    product_model: Product = await ProductRepository.update_partial_object(
+    product_id = 1
+    await ProductRepository.update_partial_object(
         session=session,
-        object_id=1,
+        object_id=product_id,
         data=product_update_data,
     )
-    assert product_update_data.name == product_model.name
-    assert product_update_data.price == product_model.price
+
+    product: Product = await session.get(Product, product_id)
+
+    assert product.name == product_update_data.name
+    assert product.price == product_update_data.price
 
 
 async def test_dont_update_partial_object_to_already_exists_name(
@@ -79,7 +89,7 @@ async def test_dont_update_partial_object_to_already_exists_name(
 async def test_delete_object(session, products):
     product_id = 1
 
-    product_model = await ProductRepository.delete_object(
+    product_model: Product = await ProductRepository.delete_object(
         session=session,
         object_id=product_id,
         )

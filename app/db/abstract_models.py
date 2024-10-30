@@ -28,10 +28,11 @@ class Base(DeclarativeBase):
         return f"<{self.__class__.__name__} {', '.join(repr_cols_with_vals)}>"
 
     def to_dict(self):
+        """method use in tests"""
         return {
             column.key: getattr(self, column.key)
             for column in class_mapper(self.__class__).columns
-            if column.name != "id"
+            if column.name not in ("id", "created_at")
         }
 
 
