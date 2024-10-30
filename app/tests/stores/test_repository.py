@@ -7,14 +7,16 @@ from app.utils.exceptions import DBIntegrityException
 
 
 async def test_get_objects(session, stores):
-    stores_models: list[Store] = await StoreRepository.get_objects(session=session)
+    stores_models: list[Store] = await StoreRepository.get_objects(
+        session=session)
 
     stores_from_rep = [store_model.to_dict() for store_model in stores_models]
     assert stores_from_rep == stores
 
 
 async def test_get_object(session, stores):
-    store_model: Store = await StoreRepository.get_object(session=session, object_id=1)
+    store_model: Store = await StoreRepository.get_object(
+        session=session, object_id=1)
     store_from_rep = store_model.to_dict()
     assert store_from_rep in stores
 
