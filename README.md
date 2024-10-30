@@ -96,6 +96,63 @@
     docker exec -it sales_app python -m app.db.test_data.test_data_scripts
     ```
     Скрипт пересоздает таблицы и заполняет их тестовыми данными
+- ## Без Docker
+    ### Особенности среды:
+    - Аналогичная среде разработки
+    ### Требования к запуску:
+    - Интерпретатор python
+    - Postgres или Docker Desktop
+    ### Запуск проекта:
+    #### 1. Клонировать репозиторий
+    ```bash                                                    
+    git clone https://github.com/E-n-d-l-e-s-s-A-I/DNS-Test-Task
+    ```
+    #### 2. Активировать виртуальное окружение и установить зависимости
+    в корне проекта выполнить консольные команды:
+    ```bash
+    python -m venv venv
+    venv\scripts\activate
+    pip install -r requirements.txt
+    ```
+    #### 3. Создать базу данных в Postgres
+    Конфигурация находится в .env
+    ```bash                                                    
+    POSTGRES_DB=sales
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=root
+    DB_HOST=localhost
+    ```
+    #### 4. Выполнить миграции
+    в корне проекта
+    ```bash                                                    
+    alembic upgrade head
+    ```
+    #### 5. При необходимости можно заполнить БД тестовыми данными
+    В корне проекта
+    ```bash                                                    
+    python -m app.db.test_data.test_data_scripts
+    ```
+    #### 6. Запустить сервер
+    в корне проекта
+    ```bash                                                    
+    uvicorn app.main:app --reload
+    ```
+    #### 7. Теперь приложение запущено на `http://127.0.0.1:8000/`
+    Ознакомится с конечным точками API можно по адресу `http://127.0.0.1:8000/docs`
+
+    #### 8. Для запуска тестов создать базу данных в Postgres
+    Конфигурация находится в .env
+    ```bash                                                    
+    TEST_POSTGRES_DB=sales_test
+    TEST_POSTGRES_USER=postgres
+    TEST_POSTGRES_PASSWORD=root
+    TEST_DB_HOST=localhost
+    ```
+    #### 9. Запуск тестов
+    в корне проекта
+    ```bash                                                    
+    pytest
+    ```
 # Используемые библиотеки:
 - _fastapi_ - для создания самого API
 - _sqlalchemy_ - для работы с базой данных через ORM
