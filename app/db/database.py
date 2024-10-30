@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import (
 
 from app.config import settings
 
-
+# Determine the appropriate database URL
+# and configuration based on the application mode
 if settings.MODE == "TEST":
     DATABASE_URL = settings.TEST_DATABASE_URL
     DATABASE_KWARGS = {"savemode": True, "poolclass": NullPool}
@@ -19,7 +20,10 @@ else:
 
 
 class Database:
-
+    """
+    Class configures and provides access to
+    the asynchronous SQLAlchemy database engine and sessions.
+    """
     def __init__(
         self, url:
             str,

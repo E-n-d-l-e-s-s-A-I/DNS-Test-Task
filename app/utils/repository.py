@@ -1,3 +1,5 @@
+"""Module defines repository class with base CRUD operations."""
+
 from typing import Any
 
 from sqlalchemy import select

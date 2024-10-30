@@ -1,4 +1,4 @@
-"""Module defines validators for pydantic schemas"""
+"""Module defines validators for pydantic schemas."""
 
 from decimal import Decimal
 

@@ -1,3 +1,5 @@
+"""Module defines custom HTTP exceptions."""
+
 from typing import Any
 from fastapi import HTTPException
 

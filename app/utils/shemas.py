@@ -1,4 +1,4 @@
-"""Module defines utils pydantic schemas for app"""
+"""Module defines utils pydantic schemas for app."""
 
 from pydantic import BaseModel
 

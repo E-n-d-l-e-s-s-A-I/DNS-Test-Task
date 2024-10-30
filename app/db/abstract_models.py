@@ -1,4 +1,4 @@
-"""Module defines abstract SQLAlchemy models"""
+"""Module defines abstract SQLAlchemy models."""
 
 from sqlalchemy import String
 from sqlalchemy.orm import (

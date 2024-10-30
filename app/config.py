@@ -4,6 +4,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Class to manage the application settings."""
+
     MODE: Literal["DEV", "TEST", "PROD"]
 
     POSTGRES_DB: str
