@@ -91,9 +91,10 @@ async def test_get_product(ac: AsyncClient, id, status_code):
 
 
 @pytest.mark.parametrize(
-    ("request_data", "status_code"),
+    ("id", "request_data", "status_code"),
     (
         pytest.param(
+            1,
             {
                 "name": "такого нет в датасете",
                 "price": 1,
@@ -102,6 +103,7 @@ async def test_get_product(ac: AsyncClient, id, status_code):
             id="price is int"
         ),
         pytest.param(
+            1,
             {
                 "name": "такого нет в датасете",
                 "price": 1.1,
@@ -110,6 +112,7 @@ async def test_get_product(ac: AsyncClient, id, status_code):
             id="price with 1 decimal places"
         ),
         pytest.param(
+            1,
             {
                 "name": "такого нет в датасете",
                 "price": 1.11,
@@ -118,6 +121,7 @@ async def test_get_product(ac: AsyncClient, id, status_code):
             id="price with 2 decimal places"
         ),
         pytest.param(
+            1,
             {
                 "name": "такого нет в датасете",
                 "price": 1.111,
@@ -126,14 +130,7 @@ async def test_get_product(ac: AsyncClient, id, status_code):
             id="price with 3 decimal places"
         ),
         pytest.param(
-            {
-                "invalid_param": "такого нет в датасете",
-                "price": 1,
-            },
-            422,
-            id="invalid body param",
-        ),
-        pytest.param(
+            1,
             {
                 "name": 123,
                 "price": "1",
@@ -142,6 +139,7 @@ async def test_get_product(ac: AsyncClient, id, status_code):
             id="price is str",
         ),
         pytest.param(
+            1,
             {
                 "name": 123,
                 "price": 1,
@@ -152,9 +150,9 @@ async def test_get_product(ac: AsyncClient, id, status_code):
     ),
 )
 async def test_update_partial_product(
-    ac: AsyncClient, request_data, status_code
+    ac: AsyncClient, id, request_data, status_code
 ):
-    response = await ac.post("/products", json=request_data)
+    response = await ac.patch(f"/products/{id}", json=request_data)
     assert response.status_code == status_code
 
 
@@ -170,6 +168,6 @@ async def test_update_partial_product(
     ),
 )
 async def test_delete_product(ac: AsyncClient, id, status_code):
-    response = await ac.get(f"/products/{id}")
+    response = await ac.delete(f"/products/{id}")
     print(response._content)
     assert response.status_code == status_code

@@ -66,9 +66,10 @@ async def test_get_store(ac: AsyncClient, id, status_code):
 
 
 @pytest.mark.parametrize(
-    ("request_data", "status_code"),
+    ("id", "request_data", "status_code"),
     (
         pytest.param(
+            1,
             {
                 "name": "такого нет в датасете",
                 "city_id": 1,
@@ -76,14 +77,7 @@ async def test_get_store(ac: AsyncClient, id, status_code):
             200,
         ),
         pytest.param(
-            {
-                "invalid_param": "такого нет в датасете",
-                "city_id": 1,
-            },
-            422,
-            id="invalid body param",
-        ),
-        pytest.param(
+            1,
             {
                 "name": 123,
                 "city_id": 1,
@@ -92,6 +86,7 @@ async def test_get_store(ac: AsyncClient, id, status_code):
             id="name is number",
         ),
         pytest.param(
+            1,
             {
                 "name": "такого нет в датасете",
                 "city_id": "abc",
@@ -102,9 +97,9 @@ async def test_get_store(ac: AsyncClient, id, status_code):
     ),
 )
 async def test_update_partial_store(
-    ac: AsyncClient, request_data, status_code
+    ac: AsyncClient, id, request_data, status_code
 ):
-    response = await ac.post("/stores", json=request_data)
+    response = await ac.patch(f"/stores/{id}", json=request_data)
     assert response.status_code == status_code
 
 
